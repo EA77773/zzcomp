@@ -1,3 +1,5 @@
+<meta name="google-site-verification" content="YE9F_HmQSpJvnzfuMDp1hWrqMHunMW6r2LjREER9MSE" />
+
 Time series compression for ZigZag indicator
 ===
 
