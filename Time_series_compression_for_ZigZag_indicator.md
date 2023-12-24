@@ -60,11 +60,11 @@ In the case of ZigZag indicators derived from the same time series with progress
 
 We introduce a non-constructive definition of ZigZag importance:
 
-For a given time series $T$ and difference function $d$, the ZigZag numeric importance of a data point $t_i$ is a deviation value $r_i$ such that for any $r \leq r_i$, $t_i \in T_{d,r}$ and for any $r \gt r_i$, $t_i \notin T_{d,r}$. In essence, $r_i$ denotes the maximum deviation value for which $t_i$ is included in a ZigZag indicator when the same time series is processed using the identical ZigZag calculation formula and difference function.
+For a given time series $T$ and difference function $d$, the ZigZag numeric importance of a data point $t_i$ is a deviation value $r_i$ such that for any $r \leq r_i$, $t_i \in T_{d,r}$ and for any $r' \gt r_i$, $t_i \notin T_{d,r'}$. In essence, $r_i$ denotes the maximum deviation value for which $t_i$ is included in a ZigZag indicator when the same time series is processed using the identical ZigZag calculation formula and difference function.
 
 Real-life time series include data points that do not feature in any ZigZag indicator, regardless of how small the chosen deviation value may be. For convenience, we assign an importance value of $0$ to these data points. Such points are typically situated within both increasing or decreasing segments absent of reversals, as well as extrema comprising multiple identical points.
 
-Suppose we can efficiently compute the ZigZag importance value for each $t_i$ in a time series $T$ and as a result generate a vector $L_{T, d} = (r_1, r_2, \ldots, r_n)$, where $r_i$ represents the importance of $t_i$ for a given difference function $d$. Then calculating the ZigZag can be achieved by filtering data points and applying $L_{T, d}$ as a filter, which mathematically can be expressed as $T_{d, r} = (t_i: r_i \geq r, t_i \in T, r_i \in L_{T, d})$.
+Suppose we can efficiently compute the ZigZag importance value for each $t_i$ in a time series $T$ and as a result generate a vector $L_{T, d} = (r_1, r_2, \ldots, r_n)$, where $r_i$ represents the importance of $t_i$ for a given difference function $d$. Then calculating the ZigZag indicator can be achieved by filtering data points and applying $L_{T, d}$ as a filter, which mathematically can be expressed as $T_{d, r} = (t_i: r_i \geq r, t_i \in T, r_i \in L_{T, d})$.
 
 For increasing deviations $r_1 \lt r_2$, we can enhance the efficiency of calculating the higher-deviation indicator ($T_{d, r_2}$) by reapplying the filter to the points from the lower-deviation indicator ($T_{d, r_1}$). This optimisation can be mathematically expressed as $T_{d, r_2} = (t_{i_j}: r_{i_j} \geq r_2, t_{i_j} \in T_{d, r_1}, r_{i_j} \in L_{T, d})$. Notably, this approach differs from the optimisation used in traditional methods, where the entire ZigZag calculation procedure is reapplied to the previously computed indicator with a lower deviation.
 
@@ -181,13 +181,13 @@ and apply the corresponding rule:
 4. For the remaining points in $S = (t_{i_1}, t_{i_2}, \ldots, t_{i_m})$:
     1. If $m=1$, set $r_{i_1}$ to $0$, otherwise
     2. Set $r_{i_1}$ to $|d(t_{i_1}, t_{i_2})|$ and $r_{i_m}$ to $|d(t_{i_{m-1}}, t_{i_m})|$.
-    3. If $m>2$ set $r_{i_j}$ to $max(|d(t_{i_{j-1}}, t_{i_j})|,|d(t_{i_j}, t_{i_{j+1}})|)$.
+    3. If $m \geq 3$ set $r_{i_j}$ to $max(|d(t_{i_{j-1}}, t_{i_j})|,|d(t_{i_j}, t_{i_{j+1}})|)$, where $1 < j < m$.
 
-In the procedure above, rules 2.1 and 2.2 are the same as in the longest ZigZag indicator algorithm. In fact, a longest ZigZag indicator can be generated from importances $L_{T, d}$ by selecting all points $t_i$ such that $r_i \gt 0$. Rule 2.3 is met when three segments are arranged in a Z-shaped formation, where the middle segment is shorter than or equal in length to the two outer segments.
+In the procedure above, rules 2.1 and 2.2 are the same as in the longest ZigZag indicator algorithm. In fact, a longest ZigZag indicator can be generated from importances $L_{T, d}$ by selecting all points $t_i$ such that $r_i \gt 0$. Condition 2.3 is satisfied when a set of three consecutive segments is arranged in a Z-shaped formation, where the middle segment is shorter than or equal in length to the two outer segments.
 
 Similar to the previous algorithm, the testing order of data points in step 2 is undefined, making any order valid. Additionally, if the condition in rule 2.i is satisfied, then condition in 2.ii will fail for the same points. Likewise, if 2.ii is satisfied, 2.iii will fail.
 
-The conditions for the rules in step 2 can be expressed using the difference function $d$, which may lead to a more efficient implementation. However, such a difference function must satisfy the following two axioms for any real values $a$, $b$ and $c$:
+The conditions for the rules in step 2 can be expressed using the difference function $d$, which may lead to a more efficient implementation. However, such a difference function must satisfy the following two axioms for any data point values $a$, $b$ and $c$:
 
 - $d(a,b)=-d(b,a)$
 - $a \lt b \lt c$ if and only if $0 \lt d(a,b) \lt d(a,c)$
